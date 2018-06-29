@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">StockApp</string>
+    <string name="iex_authorization">Data provided for free by IEX</string>
+</resources>
