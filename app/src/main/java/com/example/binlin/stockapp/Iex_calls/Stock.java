@@ -1,4 +1,4 @@
-package com.example.binlin.stockapp.Ixe_call;
+package com.example.binlin.stockapp.Iex_calls;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -14,6 +14,7 @@ public class Stock implements Parcelable {
     private List<chartStock> chart;
 
     protected Stock(Parcel in) {
+
     }
 
     public static final Creator<Stock> CREATOR = new Creator<Stock>() {
@@ -43,6 +44,7 @@ public class Stock implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+
     }
 
     public class IncStock {

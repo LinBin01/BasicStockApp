@@ -5,12 +5,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.example.binlin.stockapp.Ixe_call.IEXApi;
-import com.google.gson.Gson;
+import com.example.binlin.stockapp.Iex_calls.IEXApi;
+import com.example.binlin.stockapp.Iex_calls.Stock;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -21,9 +24,10 @@ public class MainActivity extends AppCompatActivity {
     private Bundle bundle;
     private Retrofit iexRetrofit;
     private StockFragment stockFragment;
+    public static final String STOCK_KEY = "stock key";
+
     @BindView(R.id.company_symbol_textView)
     protected TextInputEditText companySymbolEditText;
-
 
 
     @Override
@@ -32,13 +36,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         bundle = new Bundle();
+        stockFragment = StockFragment.newInstance();
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        iexBaseUrl = "https://api.iextrading.com/1.0";
+        iexBaseUrl = "https://api.iextrading.com/1.0/";
 
         iexApi = getIexRetrofit().create(IEXApi.class);
 
@@ -52,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.search_button)
-    protected void searchButtonClicked(){
+    protected void searchButtonClicked() {
         if (companySymbolEditText.getText().toString().isEmpty()) {
             Toast.makeText(this, "You need to enter a company's symbol", Toast.LENGTH_SHORT).show();
         } else {
@@ -61,7 +66,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getStock(String companyName) {
+        iexApi.getStock(companyName).enqueue(new Callback<Stock>() {
+            @Override
+            public void onResponse(Call<Stock> call, Response<Stock> response) {
+                if (response.isSuccessful()) {
+                    bundle.putParcelable(STOCK_KEY, response.body());
+                    transitionToStockFragment();
+                } else {
+                    Toast.makeText(MainActivity.this, "IEX call made, but unsuccessful", Toast.LENGTH_SHORT).show();
+                }
+            }
 
+            @Override
+            public void onFailure(Call<Stock> call, Throwable t) {
+                Toast.makeText(MainActivity.this, "Call Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void transitionToStockFragment() {
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_holder, stockFragment).commit();
     }
 
 
